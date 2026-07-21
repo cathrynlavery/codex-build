@@ -1,0 +1,15 @@
+{
+  "name": "codex-build",
+  "metadata": {
+    "description": "Orchestrator drives, Codex codes — execute an approved plan one task at a time with a test gate before every commit and exactly one PR at the end"
+  },
+  "owner": {
+    "name": "Cathryn Lavery"
+  },
+  "plugins": [
+    {
+      "name": "codex-build",
+      "source": "./"
+    }
+  ]
+}

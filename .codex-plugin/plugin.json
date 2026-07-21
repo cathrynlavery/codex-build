@@ -1,0 +1,36 @@
+{
+  "name": "codex-build",
+  "description": "Orchestrator drives, Codex codes - execute an approved plan one task at a time with a test gate before every commit and exactly one PR at the end",
+  "version": "2.0.0",
+  "author": {
+    "name": "Cathryn Lavery",
+    "url": "https://github.com/cathrynlavery"
+  },
+  "homepage": "https://github.com/cathrynlavery/codex-build",
+  "repository": "https://github.com/cathrynlavery/codex-build",
+  "license": "MIT",
+  "keywords": [
+    "codex",
+    "claude-code",
+    "orchestration",
+    "code-review",
+    "test-gate",
+    "agentic"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Codex Build",
+    "shortDescription": "Execute an approved plan with Codex as the coder — one task per commit, one PR.",
+    "longDescription": "Your agent orchestrates: it sequences an approved plan, briefs OpenAI Codex to write all the product code, reviews every diff, runs the test gate before each commit, commits one task at a time, and opens exactly one PR at the end.",
+    "developerName": "Cathryn Lavery",
+    "category": "Developer Tools",
+    "capabilities": ["Read", "Write", "Edit", "Bash"],
+    "websiteURL": "https://github.com/cathrynlavery/codex-build",
+    "defaultPrompt": [
+      "codex-build this plan: plan.md",
+      "You orchestrate, Codex codes — execute the approved plan.",
+      "Have Codex build this bead-by-bead and open one PR."
+    ],
+    "brandColor": "#b5523a"
+  }
+}

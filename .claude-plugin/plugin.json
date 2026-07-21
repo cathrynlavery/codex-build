@@ -1,0 +1,16 @@
+{
+  "name": "codex-build",
+  "description": "Orchestrator drives, Codex codes — execute an approved plan one task at a time with a test gate before every commit and exactly one PR at the end",
+  "version": "2.0.0",
+  "homepage": "https://github.com/cathrynlavery/codex-build",
+  "repository": "https://github.com/cathrynlavery/codex-build",
+  "license": "MIT",
+  "keywords": [
+    "codex",
+    "claude-code",
+    "orchestration",
+    "code-review",
+    "test-gate",
+    "agentic"
+  ]
+}
