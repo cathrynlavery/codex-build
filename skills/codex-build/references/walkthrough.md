@@ -10,12 +10,12 @@ elided.
 
 ```
 $ codex exec "Reply with the single word READY" \
-    -m gpt-5.6-codex -c model_reasoning_effort="high" -s read-only --ephemeral < /dev/null
+    -m gpt-6-astra -c model_reasoning_effort="high" -s read-only --ephemeral < /dev/null
 READY
 $ git checkout -b feat/api-rate-limit
 ```
 
-Orchestrator announces: `MODEL=gpt-5.6-codex EFFORT=high TRACKER=markdown`, shows
+Orchestrator announces: `MODEL=gpt-6-astra EFFORT=high TRACKER=markdown`, shows
 the ordered task list (T1 → T2 → T3), and creates durable state under the
 worktree's private Git directory:
 
@@ -46,7 +46,7 @@ out-of-scope (T2/T3), and done-criteria including the gate command.
 
 ```
 $ codex exec "<brief>" -C "$(git rev-parse --show-toplevel)" -s workspace-write \
-    -m gpt-5.6-codex -c model_reasoning_effort="high" < /dev/null
+    -m gpt-6-astra -c model_reasoning_effort="high" < /dev/null
 ```
 
 **T1 — enforce scope, then review.** The executable check runs first:

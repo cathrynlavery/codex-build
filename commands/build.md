@@ -1,6 +1,6 @@
 ---
 description: Execute an approved plan with Codex as the coder — one task per commit, one PR at the end
-argument-hint: <plan-file> [high|xhigh] [--model <name>]
+argument-hint: <plan-file> [high|xhigh|max] [--model <name>]
 allowed-tools:
   - Bash
   - Read
@@ -17,7 +17,7 @@ Full argument string: `$ARGUMENTS`
 
 ## Defaults
 
-- Effort defaults to `high`; pass `xhigh` for hard/architectural work.
+- Effort defaults to `high`; pass `xhigh` or `max` for hard/architectural work. Never `ultra` (auto-delegation breaks the one-task/one-commit contract).
 - Model resolves from `--model`, else `$CODEX_BUILD_MODEL`, else your Codex config default. Announce the resolved model/effort before starting.
 
 ## Required behaviour
