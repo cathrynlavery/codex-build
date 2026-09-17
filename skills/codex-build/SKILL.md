@@ -3,7 +3,7 @@ name: codex-build
 description: "Orchestrator drives, Codex codes. Execute an approved plan one task at a time: your agent (Claude Code, etc.) sequences the work, briefs OpenAI Codex to write ALL product code, reviews every diff, runs the test gate BEFORE each commit, commits one task per commit, and opens exactly ONE PR at the end. Use when the user says 'codex-build', 'have codex code it', 'you orchestrate, codex codes', or hands over a plan for step-by-step implementation."
 license: MIT
 metadata:
-  version: "2.1"
+  version: "2.2"
 ---
 
 # codex-build — orchestrator drives, Codex codes
@@ -32,13 +32,30 @@ does the typing.
 | Variable | How to resolve | Default |
 | --- | --- | --- |
 | `MODEL` | `--model` arg, else `$CODEX_BUILD_MODEL`, else your Codex config default | pin one you have access to (see below) |
-| `EFFORT` | second positional arg, else `$CODEX_BUILD_EFFORT` | `high` (opt into `xhigh` for hard/architectural work) |
+| `EFFORT` | second positional arg, else `$CODEX_BUILD_EFFORT` | `high` (opt into `xhigh`/`max` for hard/architectural work) |
 | `TRACKER` | detect: `bd` on PATH → `beads`, else `markdown` | `markdown` |
 
-**Pin a model.** Run `codex exec --help` / check `~/.codex/config.toml` for what
-your account exposes (e.g. `gpt-5-codex`, `gpt-5.6-codex`). Announce the resolved
+**Pin a model.** List what your account exposes from the CLI's model cache:
+```bash
+python3 -c 'import json,os;d=json.load(open(os.path.expanduser("~/.codex/models_cache.json")));print([m["slug"] for m in d["models"]])'
+```
+Then check `~/.codex/config.toml` for the configured default. Current slugs
+(Codex CLI ≥ 0.154, Sept 2026):
+
+| Slug | Tier | Efforts accepted | Use for |
+| --- | --- | --- | --- |
+| `gpt-6-astra` | most capable | low…max (+`ultra`, see below) | hard/architectural tasks, gnarly refactors |
+| `gpt-5.6-sol` | frontier coding | low…max (+`ultra`) | default coder for most plans |
+| `gpt-5.6-terra` | balanced | low…max (+`ultra`) | everyday tasks when Sol quota is tight |
+| `gpt-5.6-luna` | fast/cheap | low…max | trivial-mechanical tasks only |
+
+Retired: `gpt-5-codex`, `gpt-5.x-codex`, `gpt-5.4` (Codex remaps them to
+`gpt-5.6-terra` with a warning — pin explicitly instead). Announce the resolved
 `MODEL`/`EFFORT` to the user before starting so the run is reproducible. If the
-CLI rejects `xhigh`, fall back to `high` and tell the user.
+CLI rejects `max`, fall back to `xhigh`; if it rejects `xhigh`, fall back to
+`high` — and tell the user. **Never use `ultra`**: it enables automatic task
+delegation (Codex spawning its own sub-agents), which breaks the one-task,
+one-scope-check, one-commit contract this skill depends on.
 
 ## Arguments
 
@@ -49,7 +66,7 @@ CLI rejects `xhigh`, fall back to `high` and tell the user.
   [`references/plan-example.md`](references/plan-example.md) for the shape. If the
   plan has prose but no task list, extract one and show it to the user before
   coding.
-- `[effort]` — `high` (default) | `xhigh`.
+- `[effort]` — `high` (default) | `xhigh` | `max`. (`ultra` is rejected; see Config.)
 
 ## Step 0 — Preflight (once)
 
@@ -60,7 +77,8 @@ CLI rejects `xhigh`, fall back to `high` and tell the user.
    codex exec "Reply with the single word READY" \
      -m "$MODEL" -c model_reasoning_effort="$EFFORT" -s read-only --ephemeral < /dev/null
    ```
-   If `xhigh` is rejected, fall back to `high` and tell the user.
+   If `max` is rejected, fall back to `xhigh`; if `xhigh` is rejected, fall back
+   to `high` — and tell the user.
    **Always redirect `< /dev/null`** on every `codex exec` (see Rails) — without
    it, a non-interactive run hangs forever on "Reading additional input from
    stdin…" instead of doing the work.
@@ -255,13 +273,61 @@ For each task, in dependency order:
   immediate EOF so it proceeds. This is the single most common way to make the
   whole run silently hang.
 - Tests before every commit — non-negotiable.
-- Effort stays `high`/`xhigh`. A trivial-mechanical task may drop to `high`
-  (never lower); note it.
+- Effort stays `high`/`xhigh`/`max`. A trivial-mechanical task may drop to `high`
+  (never lower, never `ultra`); note it.
 - If the plan and the user's live instructions conflict, the **user wins** —
   note the deviation in the PR body.
 - Secrets never go into briefs, commits, or PR bodies.
 - A commit that later tasks built on turned out wrong? Fix forward with a new
   task/commit. Don't rewrite pushed history.
+
+## Driving codex exec (field-tested constraints)
+
+- **Codex will run `git commit` AND `git push` unbidden.** Observed mid-run: a
+  correction round ended "complete and pushed" with nothing in the brief asking
+  for it — one round after the same session reported `.git` was read-only.
+  Capability varies between rounds; never infer from one round that git is
+  unavailable to it. Put this block, verbatim, at the top of every brief:
+
+  ```
+  ## ABSOLUTE PROHIBITION — NO GIT WRITES, NO bd, NO xcodegen
+  Do NOT run git commit, push, add, stash, checkout, reset, or any writing git command.
+  Do NOT run `bd` (it writes to git). Leave your work as uncommitted changes.
+  Read-only git (status, diff, log) is fine.
+  ```
+
+  Verify rather than trust: capture `git rev-parse HEAD` before each Codex call
+  and compare after. A moved HEAD is a hard stop.
+- **The `bd` ban holds even on beads repos.** Codex will obey the repo's own
+  AGENTS.md and run `bd prime`, which internally attempts `git add` and rewrites
+  `.beads/issues.jsonl`. Tracker writes belong to the orchestrator only.
+- **`codex exec resume` rejects `-C` and `-s`** (`error: unexpected argument
+  '-C' found`). It inherits cwd — and filters recorded sessions by it — and
+  inherits the resumed session's sandbox. Working shape:
+
+  ```bash
+  cd "$REPO_ROOT" && codex exec resume --last "<corrections>" \
+    -m "$MODEL" -c model_reasoning_effort="$EFFORT" < /dev/null
+  ```
+
+  The `< /dev/null` is still mandatory on resume.
+- **`xcodebuild` is impossible inside Codex's sandbox.** Xcode's SwiftPM
+  local-package resolution spawns a nested `sandbox-exec` the outer sandbox
+  refuses (`sandbox_apply: Operation not permitted`); `swift test` works. Treat
+  every Codex build claim as unverified — the orchestrator runs the build gate.
+  Say so in the brief so Codex doesn't waste rounds retrying with cache
+  redirection.
+- **Exit 144 means resume, don't restart.** A `codex exec` run killed mid-stream
+  (e.g. a usage-limit kill; log ends mid-diff with no error banner) exits 144
+  with the working tree intact. Grep the log head for `session id:` and
+  `codex exec resume <session-id>` from the repo cwd — no `-C`/`-s`,
+  `< /dev/null` still required.
+- **Codex's sandbox denies Go module cache writes.** `go test` fails with
+  `open ~/go/pkg/mod/cache/download/....lock: operation not permitted` — an
+  environment failure that reads like a code failure and triggers identical
+  patch retries. Brief Codex to set a workspace-local
+  `GOMODCACHE=$PWD/.gomodcache`, or run the test gate yourself outside the
+  sandbox.
 
 ## See also
 

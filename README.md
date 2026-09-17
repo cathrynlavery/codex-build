@@ -99,7 +99,8 @@ npx skills add https://github.com/cathrynlavery/codex-build --skill codex-build
    ```
    /codex-build:build plan.md            # effort defaults to `high`
    /codex-build:build plan.md xhigh      # harder / architectural work
-   /codex-build:build plan.md --model gpt-5.6-codex
+   /codex-build:build plan.md max        # hardest problems (falls back to xhigh if rejected)
+   /codex-build:build plan.md --model gpt-6-astra
    ```
 
 The orchestrator confirms the model/effort, shows you the ordered tasks, then runs the per-task loop until the queue is empty and opens one PR. See [`references/walkthrough.md`](skills/codex-build/references/walkthrough.md) for a full trace of a single task.
@@ -108,8 +109,8 @@ The orchestrator confirms the model/effort, shows you the ordered tasks, then ru
 
 | Variable | Default | Notes |
 | --- | --- | --- |
-| `CODEX_BUILD_MODEL` | your Codex config default | pin a model you have access to; check `~/.codex/config.toml` |
-| `CODEX_BUILD_EFFORT` | `high` | `high` or `xhigh` |
+| `CODEX_BUILD_MODEL` | your Codex config default | pin a model you have access to (e.g. `gpt-6-astra`, `gpt-5.6-sol`); list them from `~/.codex/models_cache.json` |
+| `CODEX_BUILD_EFFORT` | `high` | `high`, `xhigh`, or `max` (`ultra` is refused) |
 
 `--model` / the effort argument override the env vars for a single run.
 
