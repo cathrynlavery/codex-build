@@ -40,17 +40,19 @@ does the typing.
 python3 -c 'import json,os;d=json.load(open(os.path.expanduser("~/.codex/models_cache.json")));print([m["slug"] for m in d["models"]])'
 ```
 Then check `~/.codex/config.toml` for the configured default. Current slugs
-(Codex CLI ≥ 0.154, Sept 2026):
+(Codex CLI 0.165, Oct 2026; re-list them, the catalog moves):
 
 | Slug | Tier | Efforts accepted | Use for |
 | --- | --- | --- | --- |
 | `gpt-6-astra` | most capable | low…max (+`ultra`, see below) | hard/architectural tasks, gnarly refactors |
-| `gpt-5.6-sol` | frontier coding | low…max (+`ultra`) | default coder for most plans |
-| `gpt-5.6-terra` | balanced | low…max (+`ultra`) | everyday tasks when Sol quota is tight |
-| `gpt-5.6-luna` | fast/cheap | low…max | trivial-mechanical tasks only |
+| `gpt-6.1-sol` | latest workhorse | low…max (+`ultra`) | default coder for most plans |
+| `gpt-6.1-terra` | balanced | low…max (+`ultra`) | everyday tasks when Sol quota is tight |
+| `gpt-6-luna` | fast/cheap | low…max | trivial-mechanical tasks only |
 
-Retired: `gpt-5-codex`, `gpt-5.x-codex`, `gpt-5.4` (Codex remaps them to
-`gpt-5.6-terra` with a warning — pin explicitly instead). Announce the resolved
+`gpt-6-sol` and `gpt-5.6-sol/terra/luna` are still listed as older generations.
+
+Retired: `gpt-5-codex`, `gpt-5.4`, `gpt-5.5` (Codex rejects them on ChatGPT
+accounts). Announce the resolved
 `MODEL`/`EFFORT` to the user before starting so the run is reproducible. If the
 CLI rejects `max`, fall back to `xhigh`; if it rejects `xhigh`, fall back to
 `high` — and tell the user. **Never use `ultra`**: it enables automatic task

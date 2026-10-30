@@ -109,7 +109,7 @@ The orchestrator confirms the model/effort, shows you the ordered tasks, then ru
 
 | Variable | Default | Notes |
 | --- | --- | --- |
-| `CODEX_BUILD_MODEL` | your Codex config default | pin a model you have access to (e.g. `gpt-6-astra`, `gpt-5.6-sol`); list them from `~/.codex/models_cache.json` |
+| `CODEX_BUILD_MODEL` | your Codex config default | pin a model you have access to (e.g. `gpt-6-astra`, `gpt-6.1-sol`); list them from `~/.codex/models_cache.json` |
 | `CODEX_BUILD_EFFORT` | `high` | `high`, `xhigh`, or `max` (`ultra` is refused) |
 
 `--model` / the effort argument override the env vars for a single run.
