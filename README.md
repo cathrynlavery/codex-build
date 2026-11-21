@@ -1,5 +1,9 @@
 # Codex Build
 
+<!-- yarkr:badges:start -->
+[![Indexed on Yarkr](https://api.yarkr.com/functions/v1/api/api/v1/badges/repos/cathrynlavery/codex-build/version.svg)](https://yarkr.com/arks/cathrynlavery/codex-build)
+<!-- yarkr:badges:end -->
+
 **One model orchestrates. Another writes the code. The tests run before every commit.**
 
 Your agent (Claude Code, or any Skills-capable harness) plays *orchestrator*: it sequences an approved plan, briefs [OpenAI Codex](https://github.com/openai/codex) to write all the product code, reviews every diff, runs the test gate, and commits — **one task per commit, one PR per plan**. Codex does the typing; the orchestrator guards the gate.
@@ -85,6 +89,38 @@ npx skills add https://github.com/cathrynlavery/codex-build --skill codex-build
 ```
 
 ---
+
+<!-- yarkr:install:start -->
+## Install with Yarkr
+
+This repo is indexed on [Yarkr](https://yarkr.com/arks/cathrynlavery/codex-build) as the ark [cathrynlavery/codex-build](https://yarkr.com/arks/cathrynlavery/codex-build), so its skills install into Claude Code, Codex, Cursor and other agent harnesses with one command.
+
+### CLI
+
+Install the whole ark, which Yarkr keeps equal to this repo:
+
+```bash
+npx yarkr-cli sync cathrynlavery/codex-build
+```
+
+Or add individual skills:
+
+```bash
+npx yarkr-cli add skill:cathrynlavery/codex-build/codex-build
+```
+
+No Node.js? `curl -fsSL https://yarkr.com/install.sh | sh` (macOS, Linux) or `irm https://yarkr.com/install.ps1 | iex` (Windows PowerShell) installs `yarkr` as a standalone binary; then type `yarkr` in place of `npx yarkr-cli`.
+
+### MCP
+
+Connect your agent to the ark over MCP:
+
+```bash
+npx yarkr-cli mcp add cathrynlavery/codex-build
+```
+
+Or point any MCP client at `https://api.yarkr.com/functions/v1/api/mcp/o/cathrynlavery/codex-build`.
+<!-- yarkr:install:end -->
 
 ## Quickstart
 
